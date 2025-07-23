@@ -263,3 +263,27 @@ exports.getUserArticles = async (req, res, next) => {
     next(err);
   }
 };
+
+exports.getUserArticlesById = async (req, res, next) => {
+  try {
+    const article = await Article.findByPk(req.params.id);
+
+    if (!article) {
+      throw new HttpError("Article not found", 404);
+    }
+
+    // Check if user owns the article
+    if (article.user_id !== req.user.id) {
+      throw new HttpError("Not authorized", 403);
+    }
+    res.status(200).json({
+      success: true,
+      message: "fetch one article successfully",
+      data: {
+        article,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
+};

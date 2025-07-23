@@ -72,14 +72,15 @@ npm run dev
 
 - `POST /api/auth/register` - Register a new user
 - `POST /api/auth/login` - Login and get JWT token
+- `POST /api/auth/profile` - get profile use JWT token
 
 ### Articles
 
 - `GET /api/articles` - Get all articles (with pagination and filters)
 - `GET /api/articles/:id` - Get a specific article
-- `POST /api/articles` - Create a new article
-- `PUT /api/articles/:id` - Update an article
-- `DELETE /api/articles/:id` - Delete an article
+- `POST /api/articles` - Create a new article(JWT)
+- `PUT /api/articles/:id` - Update an article(JWT)
+- `DELETE /api/articles/:id` - Delete an article(JWT)
 - `GET /api/articles?search=keyword` - Search articles by keyword in title
 
 ## Testing
@@ -104,51 +105,72 @@ curl -X POST http://localhost:3000/api/auth/login \
   -d '{"email": "test@example.com", "password": "password123"}'
 ```
 
+#### Profile
+
+```bash
+curl -X GET http://localhost:3000/api/auth/profile \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+
+```
+
 #### Create an article (with JWT token)
 
 ```bash
 curl -X POST http://localhost:3000/api/articles \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer YOUR_JWT_TOKEN" \
-  -d '{"title": "Test Article", "body": "This is a test article", "status": "draft"}'
+  -d '{"title": "Test Article", "body": "This is a test article"}'
 ```
 
-#### Get articles with pagination and filtering
+#### Get articles by user with pagination and filtering(JWT)
 
 ```bash
-curl -X GET "http://localhost:3000/api/articles?page=1&limit=10&status=published" \
+curl -X GET "http://localhost:3000/api/articles/user/me?page=1&limit=10&status=published&search=" \
   -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```
 
-#### Search articles by keyword
+#### Get detail articles by user with pagination and filtering(JWT)
 
 ```bash
-curl -X GET "http://localhost:3000/api/articles?search=golang" \
+curl -X GET "http://localhost:3000/api/articles/user/me/:id" \
   -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```
 
-## SQL Optimization
+#### Update articles by user(JWT)
 
-Two ways to optimize slow queries:
+```bash
+curl -X PUT "http://localhost:3000/api/articles/:id" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -d '{"title": "Test Article", "body": "This is a test article"}'
+```
 
-1. Create indexes on frequently queried columns (e.g., user_id, status, title)
-2. Use query optimization techniques like proper JOIN strategies and limiting result sets
+#### Update status by user(JWT)
 
-## Word Frequency Counter
+```bash
+curl -X PATCH "http://localhost:3000/api/articles/publish/:id" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -d '{"status": "published"}'
+```
 
-The API includes a utility function that counts word frequency in a text, ignoring capitalization.
+#### Update status by user(JWT)
 
-## System Design for Scalability
+```bash
+curl -X DELETE "http://localhost:3000/api/articles/:id" \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN"
+```
 
-To handle 1 million users:
+#### Get articles by public with pagination and filtering(PUBLIC)
 
-1. Implement horizontal scaling with load balancing
-2. Use connection pooling for database connections
-3. Implement caching with Redis for frequently accessed data
-4. Consider database sharding for large datasets
-5. Use asynchronous processing for time-consuming operations
-6. Implement rate limiting to prevent abuse
+```bash
+curl -X GET "http://localhost:3000/api/articles?page=1&limit=10&status=published&search=" \
+```
 
-## License
+#### Get detail articles by public(PUBLIC)
+
+```bash
+curl -X GET "http://localhost:3000/api/articles/:id" \
+```
 
 MIT

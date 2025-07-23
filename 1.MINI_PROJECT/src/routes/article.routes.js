@@ -30,6 +30,9 @@ router.patch(
 router.delete("/:id", articleController.deleteArticle);
 
 // Get articles by user ID (jwt)
+router.get("/user/me/:id", articleController.getUserArticlesById);
+
+// Get detailarticles by user ID (jwt)
 router.get("/user/me", articleController.getUserArticles);
 
 module.exports = router;
